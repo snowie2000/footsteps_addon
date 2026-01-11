@@ -1,5 +1,26 @@
 import { world, system, MolangVariableMap, CommandPermissionLevel, CustomCommandParamType } from "@minecraft/server";
 
+
+const colorSchema = [
+    [255, 100, 103],
+    [255, 137, 4],
+    [255, 185, 0],
+    [253, 199, 0],
+    [154, 230, 0],
+    [5, 223, 114],
+    [0, 212, 146],
+    [0, 213, 190],
+    [0, 211, 242],
+    [0, 188, 255],
+    [80, 162, 255],
+    [124, 134, 255],
+    [166, 132, 255],
+    [194, 122, 255],
+    [237, 106, 255],
+    [251, 100, 182],
+    [255, 99, 126]
+]
+
 // Register custom command: /footsteps:trail on|off
 system.beforeEvents.startup.subscribe((event) => {
     const registry = event.customCommandRegistry;
@@ -38,6 +59,62 @@ system.beforeEvents.startup.subscribe((event) => {
                     player.sendMessage("§cUsage: /footsteps:trail <on|off>");
                 });
             }
+        }
+    );
+
+    registry.registerCommand(
+        {
+            name: "footsteps:trail_time",
+            description: "Set footstep trail lifetime (in seconds)",
+            permissionLevel: CommandPermissionLevel.Any,
+            mandatoryParameters: [
+                {
+                    name: "seconds",
+                    type: CustomCommandParamType.Float
+                }
+            ]
+        },
+        (origin, seconds) => {
+            const player = origin.entity || origin.sourceEntity;
+            if (!player || player.typeId !== "minecraft:player") return;
+
+            if (seconds <= 0) {
+                system.run(() => player.sendMessage("§cLifetime must be positive."));
+                return;
+            }
+
+            system.run(() => {
+                player.setDynamicProperty("footsteps:lifetime", seconds);
+                player.sendMessage(`§aFootsteps lifetime set to ${seconds} seconds.`);
+            });
+        }
+    );
+
+    registry.registerCommand(
+        {
+            name: "footsteps:trail_color",
+            description: `Set footstep trail color index (0-${colorSchema.length - 1})`,
+            permissionLevel: CommandPermissionLevel.Any,
+            mandatoryParameters: [
+                {
+                    name: "index",
+                    type: CustomCommandParamType.Integer
+                }
+            ]
+        },
+        (origin, index) => {
+            const player = origin.entity || origin.sourceEntity;
+            if (!player || player.typeId !== "minecraft:player") return;
+
+            if (index < 0 || index >= colorSchema.length) {
+                system.run(() => player.sendMessage(`§cInvalid color index. Must be between 0 and ${colorSchema.length - 1}.`));
+                return;
+            }
+
+            system.run(() => {
+                player.setDynamicProperty("footsteps:color_index", index);
+                player.sendMessage(`§aFootsteps color set to index ${index}.`);
+            });
         }
     );
 });
@@ -84,9 +161,25 @@ system.runInterval(() => {
 function spawnFootstep(player, location) {
     const vars = new MolangVariableMap();
 
-    // Generate color from player name
-    const color = stringToColor(player.name);
+    // Determine color
+    let color;
+    const userColorIndex = player.getDynamicProperty("footsteps:color_index");
+
+    if (userColorIndex !== undefined && userColorIndex >= 0 && userColorIndex < colorSchema.length) {
+        // Use user selected color
+        const [r, g, b] = colorSchema[userColorIndex];
+        color = { red: r / 255, green: g / 255, blue: b / 255, alpha: 1 };
+    } else {
+        // Fallback to name hash color
+        color = stringToColor(player.name);
+    }
+
     vars.setColorRGBA("variable.color", color);
+
+    // Set lifetime
+    let lifetime = player.getDynamicProperty("footsteps:lifetime");
+    if (lifetime === undefined || lifetime <= 0) lifetime = 10.0;
+    vars.setFloat("variable.lifetime", lifetime);
 
     // Spawn slightly above floor level to avoid z-fighting/clipping
     try {
@@ -104,13 +197,9 @@ function stringToColor(str) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    // Convert to RGB (0-1 range)
-    // Use bitwise ops to extract bytes, then normalize
-    const r = ((hash >> 16) & 0xFF) / 255;
-    const g = ((hash >> 8) & 0xFF) / 255;
-    const b = (hash & 0xFF) / 255;
-
-    return { red: r, green: g, blue: b, alpha: 1 };
+    const idx = Math.abs(hash) % colorSchema.length;
+    const [r, g, b] = colorSchema[idx];
+    return { red: r / 255, green: g / 255, blue: b / 255, alpha: 1 };
 }
 
 /**
