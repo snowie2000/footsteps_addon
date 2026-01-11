@@ -53,7 +53,7 @@ world.afterEvents.playerLeave.subscribe((event) => {
 
 system.runInterval(() => {
     const players = world.getAllPlayers();
-    
+
     for (const player of players) {
         // Check if trail is enabled
         const isEnabled = player.getDynamicProperty("footsteps:enabled");
@@ -71,7 +71,7 @@ system.runInterval(() => {
             // Only spawn if player is on ground (approximate check)
             // In a more complex version, we'd check blocks below, 
             // but for simplicity we spawn at feet.
-            
+
             spawnFootstep(player, currentPos);
             lastPosMap.set(player.id, { x: currentPos.x, y: currentPos.y, z: currentPos.z });
         }
@@ -83,17 +83,19 @@ system.runInterval(() => {
  */
 function spawnFootstep(player, location) {
     const vars = new MolangVariableMap();
-    
+
     // Generate color from player name
     const color = stringToColor(player.name);
     vars.setColorRGBA("variable.color", color);
-    
+
     // Spawn slightly above floor level to avoid z-fighting/clipping
-    player.dimension.spawnParticle("footsteps:trail_dot", {
-        x: location.x,
-        y: location.y + 0.05, 
-        z: location.z
-    }, vars);
+    try {
+        player.dimension.spawnParticle("footsteps:trail_dot", {
+            x: location.x,
+            y: location.y + 0.05,
+            z: location.z
+        }, vars);
+    } catch { }
 }
 
 function stringToColor(str) {
@@ -101,13 +103,13 @@ function stringToColor(str) {
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     // Convert to RGB (0-1 range)
     // Use bitwise ops to extract bytes, then normalize
     const r = ((hash >> 16) & 0xFF) / 255;
     const g = ((hash >> 8) & 0xFF) / 255;
     const b = (hash & 0xFF) / 255;
-    
+
     return { red: r, green: g, blue: b, alpha: 1 };
 }
 
