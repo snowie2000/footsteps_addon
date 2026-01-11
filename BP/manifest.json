@@ -1,0 +1,26 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "Tracks player footsteps with a particle trail.",
+        "name": "Footsteps BP",
+        "uuid": "1c6d328c-4a11-4b1d-8f7d-84725350e93a",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 21, 130]
+    },
+    "modules": [
+        {
+            "description": "Script module",
+            "type": "script",
+            "language": "javascript",
+            "uuid": "7b5e439d-5b22-4c2e-9a8e-95836461f04b",
+            "version": [1, 0, 0],
+            "entry": "scripts/main.js"
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.16.0"
+        }
+    ]
+}

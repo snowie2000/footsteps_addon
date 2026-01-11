@@ -1,0 +1,18 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "Resources for the Footsteps addon.",
+        "name": "Footsteps RP",
+        "uuid": "3d7f540e-6c33-4d3f-ab9f-06947572015c",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 21, 130]
+    },
+    "modules": [
+        {
+            "description": "Resource pack module",
+            "type": "resources",
+            "uuid": "5e9a761f-8d44-4e40-bc0f-17058683126d",
+            "version": [1, 0, 0]
+        }
+    ]
+}
