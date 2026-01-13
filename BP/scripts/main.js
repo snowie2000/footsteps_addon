@@ -153,7 +153,7 @@ system.runInterval(() => {
             lastPosMap.set(player.id, { x: currentPos.x, y: currentPos.y, z: currentPos.z });
         }
     }
-}, 2); // Run every 2 ticks (approx 10 times per second)
+}, 4); // Run every 4 ticks (approx 5 times per second)
 
 /**
  * Spawns a particle at the specified location

@@ -4,7 +4,7 @@
         "description": "Tracks player footsteps with a particle trail.",
         "name": "Footsteps BP",
         "uuid": "1c6d328c-4a11-4b1d-8f7d-84725350e93a",
-        "version": [1, 0, 0],
+        "version": [1, 0, 1],
         "min_engine_version": [1, 21, 130]
     },
     "modules": [
