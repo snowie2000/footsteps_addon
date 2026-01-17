@@ -181,6 +181,10 @@ function spawnFootstep(player, location) {
     if (lifetime === undefined || lifetime <= 0) lifetime = 10.0;
     vars.setFloat("variable.lifetime", lifetime);
 
+    // Set rotation based on player yaw
+    const yaw = player.getRotation().y;
+    vars.setFloat("variable.rot", 180 - yaw);
+
     // Spawn slightly above floor level to avoid z-fighting/clipping
     try {
         player.dimension.spawnParticle("footsteps:trail_dot", {
