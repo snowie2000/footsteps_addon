@@ -5,7 +5,7 @@
       "identifier": "footsteps:trail_dot",
       "basic_render_parameters": {
         "material": "particles_add",
-        "texture": "textures/particle/particle"
+        "texture": "textures/particle/path"
       }
     },
     "components": {
@@ -33,7 +33,7 @@
           0.1,
           0.1
         ],
-        "facing_camera_mode": "lookat_xyz",
+        "facing_camera_mode": "emitter_transform_xz",
         "uv": {
           "texture_width": 16,
           "texture_height": 16,
